@@ -7,8 +7,10 @@ public class Main {
     public static void main(String[] args) {
         JFrame main = new JFrame("Flappy Birds");
 
+        GameSurface gs = new GameSurface(WIDTH, HEIGHT);
         main.setSize(WIDTH, HEIGHT);
         main.setResizable(false);
+        main.add(gs);
         main.setDefaultCloseOperation(EXIT_ON_CLOSE);
         main.setVisible(true);
     }
