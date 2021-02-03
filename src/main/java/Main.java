@@ -6,11 +6,12 @@ public class Main {
     final private static int HEIGHT = 1000;
     public static void main(String[] args) {
         JFrame main = new JFrame("Flappy Birds");
-
         GameSurface gs = new GameSurface(WIDTH, HEIGHT);
+
         main.setSize(WIDTH, HEIGHT);
         main.setResizable(false);
         main.add(gs);
+        main.addKeyListener(gs);
         main.setDefaultCloseOperation(EXIT_ON_CLOSE);
         main.setVisible(true);
     }
