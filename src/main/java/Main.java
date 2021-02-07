@@ -5,7 +5,7 @@ public class Main {
     final private static int WIDTH = 1000;
     final private static int HEIGHT = 1000;
     public static void main(String[] args) {
-        JFrame main = new JFrame("Flappy Birds");
+        JFrame main = new JFrame("Jumpy Birb");
         GameSurface gs = new GameSurface(WIDTH, HEIGHT);
 
         main.setSize(WIDTH, HEIGHT);
