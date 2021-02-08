@@ -63,6 +63,11 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
         obstacle.translate(-1, 0);
 
+        // gör att fåglen faller.
+        birb.translate(0,+5);
+       // System.out.println(birb.getLocation());
+
+
         // samma bakgrund osv som innan
         this.repaint();
     }
@@ -73,10 +78,15 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         final int kc = e.getKeyCode();
 
         if (kc == KeyEvent.VK_SPACE) {
-            birb.translate(0, -20);
+            birb.translate(0, -100);
         }
 
+
+
     }
+
+
+
 
     @Override
     public void keyTyped(KeyEvent e) {
