@@ -70,6 +70,16 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
         // samma bakgrund osv som innan
         this.repaint();
+
+        increaseSpeed();
+    }
+
+    public void increaseSpeed() {
+        // Ökar hastigheten så länge timer är över 1
+        // här har vi den men den skall vara på ett annat ställe
+        if(this.timer.getDelay() > 1) {
+            this.timer.setDelay(this.timer.getDelay()-1);
+        }
     }
 
     @Override
