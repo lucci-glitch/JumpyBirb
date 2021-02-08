@@ -10,6 +10,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     private Timer timer;
     private Rectangle birb;
     private Rectangle obstacle;
+    private Rectangle obstacle2;
     private int speed = -1;
 
     // När en Gamesurface skapas med en viss storlek, skapas aliens
@@ -19,7 +20,8 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         // hur ser avataren som du styr ut, här en rektangel  från JFrame?
         // och vilken x- och y-position börjar den på (två första)
         this.birb = new Rectangle(20, width / 2 - 15, 30, 20);
-        this.obstacle = new Rectangle(1000, 400, 150, 150);
+        this.obstacle = new Rectangle(1000, 850, 150, 450);
+        this.obstacle2 = new Rectangle(1000, 0, 150, 450);
 
         // hur lång tid det tar för hela fönstret att röra sig
         // Fires one or more ActionEvents at specified intervals. Används alltså tillsammans med en ActionEvent
@@ -47,6 +49,10 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         g.setColor(Color.red);
         g.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
 
+        // fill the obstacle
+        g.setColor(Color.green);
+        g.fillRect(obstacle2.x, obstacle2.y, obstacle2.width, obstacle2.height);
+
 
         // draw the space ship
         g.setColor(Color.black);
@@ -63,10 +69,20 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
 
         obstacle.translate(speed, 0);
+        obstacle2.translate(speed, 0);
+
 
         // gör att fåglen faller.
-        birb.translate(0,+5);
+        birb.translate(0,+2);
        // System.out.println(birb.getLocation());
+
+        if (birb.intersects(obstacle)) {
+            timer.stop();
+        }
+
+        if (birb.intersects(obstacle2)) {
+            timer.stop();
+        }
 
 
         // samma bakgrund osv som innan
