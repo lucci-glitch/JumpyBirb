@@ -73,8 +73,8 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
 
         // gör att fåglen faller.
-        birb.translate(0,+2);
-       // System.out.println(birb.getLocation());
+        birb.translate(0, +2);
+        // System.out.println(birb.getLocation());
 
         if (birb.intersects(obstacle)) {
             timer.stop();
@@ -84,6 +84,9 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             timer.stop();
         }
 
+        if(birb.y > 800){
+            timer.stop();
+        }
 
         // samma bakgrund osv som innan
         this.repaint();
@@ -97,17 +100,18 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
 
+        final int maxHeight = this.getSize().height-birb.height-10;
+        final int minHeight = 20;
+
+
         final int kc = e.getKeyCode();
 
-        if (kc == KeyEvent.VK_SPACE) {
+        if (kc == KeyEvent.VK_SPACE && birb.y > minHeight) {
             birb.translate(0, -100);
         }
 
 
-
     }
-
-
 
 
     @Override
