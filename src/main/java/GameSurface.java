@@ -20,8 +20,8 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         // hur ser avataren som du styr ut, här en rektangel  från JFrame?
         // och vilken x- och y-position börjar den på (två första)
         this.birb = new Rectangle(20, width / 2 - 15, 30, 20);
-        this.obstacle = new Rectangle(1000, 850, 150, 450);
-        this.obstacle2 = new Rectangle(1000, 0, 150, 450);
+        this.obstacle = new Rectangle(1000, 400, 150, 200);
+        this.obstacle2 = new Rectangle(1000, 0, 150, 200);
 
         // hur lång tid det tar för hela fönstret att röra sig
         // Fires one or more ActionEvents at specified intervals. Används alltså tillsammans med en ActionEvent
@@ -84,7 +84,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             timer.stop();
         }
 
-        if(birb.y > 800){
+        if(birb.y > 600){
             timer.stop();
         }
 

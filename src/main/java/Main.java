@@ -3,7 +3,7 @@ import static javax.swing.JFrame.EXIT_ON_CLOSE;
 
 public class Main {
     final private static int WIDTH = 1000;
-    final private static int HEIGHT = 1000;
+    final private static int HEIGHT = 600;
     public static void main(String[] args) {
         JFrame main = new JFrame("Jumpy Birb");
         GameSurface gs = new GameSurface(WIDTH, HEIGHT);
