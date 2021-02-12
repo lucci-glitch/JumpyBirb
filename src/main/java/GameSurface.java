@@ -12,6 +12,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     private Rectangle obstacle;
     private Rectangle obstacle2;
     private int speed = -1;
+    private boolean gameOver = false;
 
     // När en Gamesurface skapas med en viss storlek, skapas aliens
     public GameSurface(final int width, final int height) {
@@ -41,6 +42,15 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     private void repaint(Graphics g) {
         final Dimension d = this.getSize();
 
+        if (gameOver) {
+            g.setColor(new Color(255, false));
+            g.fillRect(0, 0, d.width, d.height);
+            g.setColor(Color.white);
+            g.setFont(new Font("Arial", Font.BOLD, 48));
+            g.drawString("Game over!", 375, 300);
+            return;
+        }
+
         // fill the background
         g.setColor(Color.blue);
         g.fillRect(0, 0, d.width, d.height);
@@ -62,6 +72,12 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
+        if (gameOver) {
+            timer.stop();
+            return;
+        }
+
         // this will trigger on the timer event
         // if the game is not over yet it will
         // update the positions of all aliens
@@ -76,16 +92,8 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         birb.translate(0, +2);
         // System.out.println(birb.getLocation());
 
-        if (birb.intersects(obstacle)) {
-            timer.stop();
-        }
-
-        if (birb.intersects(obstacle2)) {
-            timer.stop();
-        }
-
-        if(birb.y > 600){
-            timer.stop();
+        if (birb.intersects(obstacle) || (birb.intersects(obstacle2)) || birb.y > 600) {
+            gameOver = true;
         }
 
         // samma bakgrund osv som innan
@@ -122,7 +130,21 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
 
+        final int kc = e.getKeyCode();
+
+        if (gameOver == true && kc == KeyEvent.VK_SPACE) {
+            System.out.println("klickade efter game over");
+            restart();
+        }
     }
 
+    public void restart() {
+       gameOver = false;
+       this.birb = new Rectangle(20, 1000 / 2 - 15, 30, 20);
+       this.obstacle = new Rectangle(1000, 400, 150, 200);
+       this.obstacle2 = new Rectangle(1000, 0, 150, 200);
+       repaint();
+       this.timer.start();
+    }
 
 }
