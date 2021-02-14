@@ -21,25 +21,28 @@ public class Main {
         main.setDefaultCloseOperation(EXIT_ON_CLOSE);
         main.setVisible(true);
 
+        music();
 
+    }
+
+    private static void music() {
         try {
-        File filePath = new File("Flappy.wav");
+            File filePath = new File("Flappy.wav");
 
-        if (filePath.exists()) {
-            AudioInputStream audioInput = AudioSystem.getAudioInputStream(filePath);
-            Clip clip = AudioSystem.getClip();
-            clip.open(audioInput);
-            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-            //gainControl.setValue(getVolume());
-            clip.loop(Clip.LOOP_CONTINUOUSLY);
-            clip.start();
-        } else {
-            System.out.println("Incorrect audio file path!");
+            if (filePath.exists()) {
+                AudioInputStream audioInput = AudioSystem.getAudioInputStream(filePath);
+                Clip clip = AudioSystem.getClip();
+                clip.open(audioInput);
+                FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+                //gainControl.setValue(getVolume());
+                clip.loop(Clip.LOOP_CONTINUOUSLY);
+                clip.start();
+            } else {
+                System.out.println("Incorrect audio file path!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
     }
-    }
-
 
 }
