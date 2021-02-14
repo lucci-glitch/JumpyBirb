@@ -34,7 +34,7 @@ public class Main {
                 Clip clip = AudioSystem.getClip();
                 clip.open(audioInput);
                 // FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-                //gainControl.setValue(getVolume());
+                // gainControl.setValue(getVolume());
                 clip.loop(Clip.LOOP_CONTINUOUSLY);
                 clip.start();
             } else {
