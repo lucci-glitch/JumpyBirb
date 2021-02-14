@@ -55,7 +55,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         final Dimension d = this.getSize();
 
         if (gameOver) {
-            g.setColor(new Color(255, false));
+            g.setColor(new Color(0x0000FF, false));
             g.fillRect(0, 0, d.width, d.height);
             g.setColor(Color.white);
             g.setFont(new Font("Arial", Font.BOLD, 48));
