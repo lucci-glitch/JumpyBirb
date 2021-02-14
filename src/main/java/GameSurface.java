@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
@@ -11,6 +13,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     private Rectangle birb;
     private Rectangle obstacle;
     private Rectangle obstacle2;
+    private List<Rectangle> obstacles;
     private int speed = -1;
     private boolean gameOver = false;
 
@@ -21,8 +24,13 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         // hur ser avataren som du styr ut, här en rektangel  från JFrame?
         // och vilken x- och y-position börjar den på (två första)
         this.birb = new Rectangle(20, width / 2 - 15, 30, 20);
-        this.obstacle = new Rectangle(1000, 400, 150, 200);
-        this.obstacle2 = new Rectangle(1000, 0, 150, 200);
+        this.obstacles = new ArrayList<>();
+        
+        //räcker detta??
+        /*this.obstacle = new Rectangle(1000, 400, 150, 200);
+        this.obstacle2 = new Rectangle(1000, 0, 150, 200);*/
+
+        //en for-loop till addAlien?
 
         // hur lång tid det tar för hela fönstret att röra sig
         // Fires one or more ActionEvents at specified intervals. Används alltså tillsammans med en ActionEvent
@@ -36,6 +44,12 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         repaint(g);
+    }
+
+    // obstacles skapas med en position och en storlek
+    private void addObstacles() {
+        obstacles.add(new Rectangle(1000, 400, 150, 200));
+        obstacles.add(new Rectangle(1000, 0, 150, 200));
     }
 
 
@@ -55,13 +69,18 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         g.setColor(Color.blue);
         g.fillRect(0, 0, d.width, d.height);
 
-        // fill the obstacle
+        for (Rectangle obstacle : obstacles) {
+            g.setColor(Color.pink);
+            g.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        }
+
+        /* //fill the obstacle
         g.setColor(Color.red);
         g.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
 
         // fill the obstacle
         g.setColor(Color.green);
-        g.fillRect(obstacle2.x, obstacle2.y, obstacle2.width, obstacle2.height);
+        g.fillRect(obstacle2.x, obstacle2.y, obstacle2.width, obstacle2.height);*/
 
 
         // draw the space ship
