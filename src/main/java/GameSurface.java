@@ -4,25 +4,31 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
     private Timer timer;
     private Rectangle birb;
-    private Rectangle obstacle;
-    private Rectangle obstacle2;
+    private List<Rectangle> obstacles;
     private int speed = -1;
     private boolean gameOver = false;
+    private int score;
 
-    // När en Gamesurface skapas med en viss storlek, skapas aliens
+    // När en Gamesurface skapas med en viss storlek, skapas obstacles
     public GameSurface(final int width, final int height) {
-
+        score = 0;
 
         // hur ser avataren som du styr ut, här en rektangel  från JFrame?
         // och vilken x- och y-position börjar den på (två första)
         this.birb = new Rectangle(20, width / 2 - 15, 30, 20);
-        this.obstacle = new Rectangle(1000, 400, 150, 200);
-        this.obstacle2 = new Rectangle(1000, 0, 150, 200);
+        this.obstacles = new ArrayList<>();
+
+        // lägger till 3 obstacles (3 uppe och 3 nere)
+        for (int i = 0; i < 6; i++) {
+            addObstacles();
+        }
 
         // hur lång tid det tar för hela fönstret att röra sig
         // Fires one or more ActionEvents at specified intervals. Används alltså tillsammans med en ActionEvent
@@ -38,6 +44,12 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         repaint(g);
     }
 
+    // obstacles skapas med en position och en storlek
+    private void addObstacles() {
+        obstacles.add(new Rectangle(1000, 400, 150, 200));
+        obstacles.add(new Rectangle(1000, 0, 150, 200));
+    }
+
 
     private void repaint(Graphics g) {
         final Dimension d = this.getSize();
@@ -47,7 +59,8 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             g.fillRect(0, 0, d.width, d.height);
             g.setColor(Color.white);
             g.setFont(new Font("Arial", Font.BOLD, 48));
-            g.drawString("Game over!", 375, 300);
+            // la till score här, bara som test - problem med poängräkningen... blir alltid 12 poäng ist för 1
+            g.drawString("Game over! score: " + (score/12), 375, 300);
             return;
         }
 
@@ -55,14 +68,11 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         g.setColor(Color.blue);
         g.fillRect(0, 0, d.width, d.height);
 
-        // fill the obstacle
-        g.setColor(Color.red);
-        g.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-
-        // fill the obstacle
-        g.setColor(Color.green);
-        g.fillRect(obstacle2.x, obstacle2.y, obstacle2.width, obstacle2.height);
-
+        // fill the obstacles
+        for (Rectangle obstacle : obstacles) {
+            g.setColor(Color.pink);
+            g.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        }
 
         // draw the space ship
         g.setColor(Color.black);
@@ -72,29 +82,49 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        // this will trigger on the timer event
+        // if the game is not over yet it will
+        // update the positions of all obstacles
+        // and check for collision with the birb
 
         if (gameOver) {
             timer.stop();
             return;
         }
 
-        // this will trigger on the timer event
-        // if the game is not over yet it will
-        // update the positions of all aliens
-        // and check for collision with the space ship
+        // lista över obstacles som simmat ur bild
+        final List<Rectangle> toRemove = new ArrayList<>();
 
+        for (Rectangle obstacle : obstacles) {
+            obstacle.translate(speed, 0);
 
-        obstacle.translate(speed, 0);
-        obstacle2.translate(speed, 0);
+            // när obstacle är utanför bild, lägg i tabort-listan
+            if (obstacle.x + obstacle.y < -150) {
+                toRemove.add(obstacle);
+            }
 
+            if (birb.intersects(obstacle) || birb.y > 600) {
+                gameOver = true;
+            }
+
+            // when obstacle kommer till x=20 och ej gameOver
+            // score++ - lite issues med poängräkningen...
+            if ((obstacle.x + 150) == 20 && !gameOver) {
+                    score++;
+            }
+
+        }
+
+        // tar bort ur listan de som simmat ur bild
+        obstacles.removeAll(toRemove);
+
+        // lägger till lika många obstacles som tagits bort
+        for (int i = 0; i < toRemove.size(); i++) {
+            addObstacles();
+        }
 
         // gör att fåglen faller.
         birb.translate(0, +2);
-        // System.out.println(birb.getLocation());
-
-        if (birb.intersects(obstacle) || (birb.intersects(obstacle2)) || birb.y > 600) {
-            gameOver = true;
-        }
 
         // samma bakgrund osv som innan
         this.repaint();
@@ -104,6 +134,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     public void increaseSpeed() {
         speed--;
     }
+
 
     @Override
     public void keyReleased(KeyEvent e) {
@@ -141,8 +172,13 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     public void restart() {
        gameOver = false;
        this.birb = new Rectangle(20, 1000 / 2 - 15, 30, 20);
-       this.obstacle = new Rectangle(1000, 400, 150, 200);
-       this.obstacle2 = new Rectangle(1000, 0, 150, 200);
+
+       // la till detta för att restart fortfarande skulle fungera med mina ändringar
+       this.obstacles = new ArrayList<>();
+       this.score = 0;
+        for (int i = 0; i < 6; i++) {
+            addObstacles();
+        }
        repaint();
        this.timer.start();
     }
