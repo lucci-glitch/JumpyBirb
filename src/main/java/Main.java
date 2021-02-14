@@ -1,4 +1,10 @@
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.swing.JFrame;
+import java.io.File;
+
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 
 public class Main {
@@ -14,5 +20,26 @@ public class Main {
         main.addKeyListener(gs);
         main.setDefaultCloseOperation(EXIT_ON_CLOSE);
         main.setVisible(true);
+
+
+        try {
+        File filePath = new File("Flappy.wav");
+
+        if (filePath.exists()) {
+            AudioInputStream audioInput = AudioSystem.getAudioInputStream(filePath);
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioInput);
+            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            //gainControl.setValue(getVolume());
+            clip.loop(Clip.LOOP_CONTINUOUSLY);
+            clip.start();
+        } else {
+            System.out.println("Incorrect audio file path!");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+    }
+
+
 }
