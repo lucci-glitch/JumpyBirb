@@ -33,7 +33,7 @@ public class Main {
                 AudioInputStream audioInput = AudioSystem.getAudioInputStream(filePath);
                 Clip clip = AudioSystem.getClip();
                 clip.open(audioInput);
-                FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+                // FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
                 //gainControl.setValue(getVolume());
                 clip.loop(Clip.LOOP_CONTINUOUSLY);
                 clip.start();
