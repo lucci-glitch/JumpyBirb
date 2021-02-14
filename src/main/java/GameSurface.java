@@ -15,11 +15,9 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     private int speed = -1;
     private boolean gameOver = false;
     private int score;
-    private int firstScore;
 
     // När en Gamesurface skapas med en viss storlek, skapas obstacles
     public GameSurface(final int width, final int height) {
-        firstScore = 0;
         score = 0;
 
         // hur ser avataren som du styr ut, här en rektangel  från JFrame?
@@ -27,7 +25,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         this.birb = new Rectangle(20, width / 2 - 15, 30, 20);
         this.obstacles = new ArrayList<>();
 
-        //en for-loop till addAlien?
+        // lägger till 3 obstacles (3 uppe och 3 nere)
         for (int i = 0; i < 6; i++) {
             addObstacles();
         }
@@ -61,8 +59,8 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             g.fillRect(0, 0, d.width, d.height);
             g.setColor(Color.white);
             g.setFont(new Font("Arial", Font.BOLD, 48));
-            // la till score här, bara som test
-            g.drawString("Game over! score: " + (score), 375, 300);
+            // la till score här, bara som test - problem med poängräkningen... blir alltid 12 poäng ist för 1
+            g.drawString("Game over! score: " + (score/12), 375, 300);
             return;
         }
 
@@ -99,7 +97,6 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
         for (Rectangle obstacle : obstacles) {
             obstacle.translate(speed, 0);
-            System.out.println(obstacle.getBounds());
 
             // när obstacle är utanför bild, lägg i tabort-listan
             if (obstacle.x + obstacle.y < -150) {
@@ -111,13 +108,11 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             }
 
             // when obstacle kommer till x=20 och ej gameOver
-            // score++
-            if (obstacle.x == 20 && !gameOver) {
-                firstScore++;
-                if (firstScore % 12 == 0) {
+            // score++ - lite issues med poängräkningen...
+            if ((obstacle.x + 150) == 20 && !gameOver) {
                     score++;
-                }
             }
+
         }
 
         // tar bort ur listan de som simmat ur bild
@@ -131,7 +126,6 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         // gör att fåglen faller.
         birb.translate(0, +2);
 
-
         // samma bakgrund osv som innan
         this.repaint();
 
@@ -140,6 +134,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     public void increaseSpeed() {
         speed--;
     }
+
 
     @Override
     public void keyReleased(KeyEvent e) {
@@ -181,7 +176,6 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
        // la till detta för att restart fortfarande skulle fungera med mina ändringar
        this.obstacles = new ArrayList<>();
        this.score = 0;
-       this.firstScore = 0;
         for (int i = 0; i < 6; i++) {
             addObstacles();
         }
