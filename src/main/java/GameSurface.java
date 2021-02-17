@@ -1,10 +1,11 @@
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 
 public class GameSurface extends JPanel implements ActionListener, KeyListener {
@@ -15,6 +16,8 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     private int speed = -1;
     private boolean gameOver = false;
     private int score;
+    private List<Player> highScore = new ArrayList<>();
+
 
     // När en Gamesurface skapas med en viss storlek, skapas obstacles
     public GameSurface(final int width, final int height) {
@@ -36,6 +39,8 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         // this i (10, this) hänvisar till den här actionListenern
         this.timer = new Timer(10, this);
         this.timer.start();
+
+
     }
 
     @Override
@@ -51,16 +56,28 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     }
 
 
+
+
+
     private void repaint(Graphics g) {
         final Dimension d = this.getSize();
 
         if (gameOver) {
+            calHighScore(score);
             g.setColor(new Color(0x0000FF, false));
             g.fillRect(0, 0, d.width, d.height);
             g.setColor(Color.white);
-            g.setFont(new Font("Arial", Font.BOLD, 48));
+            g.setFont(new Font("Arial", Font.BOLD, 32));
             // la till score här, bara som test - problem med poängräkningen... blir alltid 12 poäng ist för 1
-            g.drawString("Game over! score: " + (score/12), 375, 300);
+
+
+            int pos = 100;
+            for (Player gamer : highScore) {
+                g.drawString(gamer.toString(), 100, pos);
+                pos += 42;
+            }
+
+
             return;
         }
 
@@ -110,7 +127,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             // when obstacle kommer till x=20 och ej gameOver
             // score++ - lite issues med poängräkningen...
             if ((obstacle.x + 150) == 20 && !gameOver) {
-                    score++;
+                score++;
             }
 
         }
@@ -139,7 +156,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
 
-        final int maxHeight = this.getSize().height-birb.height-10;
+        final int maxHeight = this.getSize().height - birb.height - 10;
         final int minHeight = 20;
 
 
@@ -170,17 +187,44 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     }
 
     public void restart() {
-       gameOver = false;
-       this.birb = new Rectangle(20, 1000 / 2 - 15, 30, 20);
+        gameOver = false;
+        this.birb = new Rectangle(20, 1000 / 2 - 15, 30, 20);
 
-       // la till detta för att restart fortfarande skulle fungera med mina ändringar
-       this.obstacles = new ArrayList<>();
-       this.score = 0;
+        // la till detta för att restart fortfarande skulle fungera med mina ändringar
+        this.obstacles = new ArrayList<>();
+        this.score = 0;
         for (int i = 0; i < 6; i++) {
             addObstacles();
         }
-       repaint();
-       this.timer.start();
+        repaint();
+        this.timer.start();
     }
 
+    public void createPlayer(int score) {
+
+       /* Scanner scan = new Scanner(System.in);
+        System.out.println("Ange ditt namn");
+        String input = scan.nextLine();*/
+        String input = JOptionPane.showInputDialog("Skriv ditt namn");
+
+        highScore.add(new Player(input, score));
+        highScore.sort(new ScoreComparator().reversed());
+        System.out.println(highScore);
+    }
+
+    public void calHighScore(int score) {
+        if (highScore.size() == 10 && highScore.get(highScore.size() - 1).getScore() < score) {
+            highScore.remove(highScore.size() - 1);
+            this.createPlayer(score);
+            return;
+        }
+        this.createPlayer(score);
+    }
+
+
 }
+
+
+
+
+

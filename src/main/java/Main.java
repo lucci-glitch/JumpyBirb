@@ -21,7 +21,9 @@ public class Main {
         main.setDefaultCloseOperation(EXIT_ON_CLOSE);
         main.setVisible(true);
 
-        music();
+
+
+       // music();
 
     }
 
