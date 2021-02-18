@@ -13,7 +13,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     private Timer timer;
     private Rectangle birb;
     private List<Rectangle> obstacles;
-    private int speed = -1;
+    private int speed = -5;
     private boolean gameOver = false;
     private int score;
     private List<Player> highScore = new ArrayList<>();
@@ -29,18 +29,15 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         this.obstacles = new ArrayList<>();
 
         // lägger till 3 obstacles (3 uppe och 3 nere)
-        for (int i = 0; i < 6; i++) {
-            addObstacles();
-        }
+
+        addObstacles();
 
         // hur lång tid det tar för hela fönstret att röra sig
         // Fires one or more ActionEvents at specified intervals. Används alltså tillsammans med en ActionEvent
         // An example use is an animation object that uses a Timer as the trigger for drawing its frames.
         // this i (10, this) hänvisar till den här actionListenern
-        this.timer = new Timer(10, this);
+        this.timer = new Timer(20, this);
         this.timer.start();
-
-
     }
 
     @Override
@@ -56,9 +53,6 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     }
 
 
-
-
-
     private void repaint(Graphics g) {
         final Dimension d = this.getSize();
 
@@ -68,7 +62,6 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             g.fillRect(0, 0, d.width, d.height);
             g.setColor(Color.white);
             g.setFont(new Font("Arial", Font.BOLD, 32));
-            // la till score här, bara som test - problem med poängräkningen... blir alltid 12 poäng ist för 1
 
 
             int pos = 100;
@@ -76,8 +69,6 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
                 g.drawString(gamer.toString(), 100, pos);
                 pos += 42;
             }
-
-
             return;
         }
 
@@ -116,28 +107,28 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             obstacle.translate(speed, 0);
 
             // när obstacle är utanför bild, lägg i tabort-listan
-            if (obstacle.x + obstacle.y < -150) {
+            if (obstacle.x < -150) {
+                System.out.println("tar bort");
                 toRemove.add(obstacle);
+
+                if (obstacle.y == 0) {
+                    addObstacles();
+                    System.out.println("Här läggs det till obstacles");
+                    obstacles.removeAll(toRemove);
+                }
+                System.out.println(toRemove.toString() + " toRemove");
             }
 
             if (birb.intersects(obstacle) || birb.y > 600) {
                 gameOver = true;
             }
 
-            // when obstacle kommer till x=20 och ej gameOver
-            // score++ - lite issues med poängräkningen...
-            if ((obstacle.x + 150) == 20 && !gameOver) {
+            if (obstacle.y == 0 && (obstacle.x + 150) == 20 && !gameOver) {
                 score++;
+                System.out.println(score + "score");
+                increaseSpeed();
             }
 
-        }
-
-        // tar bort ur listan de som simmat ur bild
-        obstacles.removeAll(toRemove);
-
-        // lägger till lika många obstacles som tagits bort
-        for (int i = 0; i < toRemove.size(); i++) {
-            addObstacles();
         }
 
         // gör att fåglen faller.
@@ -149,7 +140,9 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     }
 
     public void increaseSpeed() {
-        speed--;
+        if (timer.getDelay() > 0) {
+            timer.setDelay(timer.getDelay() - 1);
+        }
     }
 
 
@@ -165,8 +158,6 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         if (kc == KeyEvent.VK_SPACE && birb.y > minHeight) {
             birb.translate(0, -100);
         }
-
-
     }
 
 
@@ -190,21 +181,17 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         gameOver = false;
         this.birb = new Rectangle(20, 1000 / 2 - 15, 30, 20);
 
-        // la till detta för att restart fortfarande skulle fungera med mina ändringar
         this.obstacles = new ArrayList<>();
         this.score = 0;
-        for (int i = 0; i < 6; i++) {
-            addObstacles();
-        }
+
+        addObstacles();
+
         repaint();
+        this.timer.setDelay(20);
         this.timer.start();
     }
 
     public void createPlayer(int score) {
-
-       /* Scanner scan = new Scanner(System.in);
-        System.out.println("Ange ditt namn");
-        String input = scan.nextLine();*/
         String input = JOptionPane.showInputDialog("Skriv ditt namn");
 
         highScore.add(new Player(input, score));
