@@ -11,8 +11,19 @@ public class Main {
     final private static int WIDTH = 1000;
     final private static int HEIGHT = 600;
     public static void main(String[] args) {
+
+        int initGap = 200;
+        int initDelay = 30;
+
+        if (args[0].equals("hard")) {
+            System.out.println(args[0]);
+            initGap = 125;
+            initDelay = 15;
+        }
+        System.out.println("initGap " + initGap + " initDelay " + initDelay);
+
         JFrame main = new JFrame("Jumpy Birb");
-        GameSurface gs = new GameSurface(WIDTH, HEIGHT);
+        GameSurface gs = new GameSurface(WIDTH, HEIGHT, initGap, initDelay);
 
         main.setSize(WIDTH, HEIGHT);
         main.setResizable(false);

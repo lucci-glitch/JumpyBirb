@@ -15,14 +15,14 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     private Rectangle birb;
     private List<Rectangle> obstacles;
     private int speed = -5;
-    private int gap = 200;
     private boolean gameOver = false;
     private int score;
     private List<Player> highScore;
+    private int gap;
 
 
     // När en Gamesurface skapas med en viss storlek, skapas obstacles
-    public GameSurface(final int width, final int height) {
+    public GameSurface(final int width, final int height, int gap, int delay) {
 
         highScore = SaveAndLoad.loadHighScore();
         score = 0;
@@ -31,8 +31,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         // och vilken x- och y-position börjar den på (två första)
         this.birb = new Rectangle(20, width / 2 - 15, 30, 20);
         this.obstacles = new ArrayList<>();
-
-        // lägger till 3 obstacles (3 uppe och 3 nere)
+        this.gap = gap;
 
         addObstacles();
 
@@ -40,7 +39,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         // Fires one or more ActionEvents at specified intervals. Används alltså tillsammans med en ActionEvent
         // An example use is an animation object that uses a Timer as the trigger for drawing its frames.
         // this i (10, this) hänvisar till den här actionListenern
-        this.timer = new Timer(20, this);
+        this.timer = new Timer(delay, this);
         this.timer.start();
     }
 
@@ -154,12 +153,13 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         if (timer.getDelay() > 0) {
             timer.setDelay(timer.getDelay() - 1);
         }
+        System.out.println(timer.getDelay());
     }
 
     public void decreaseGap() {
-        if(gap > 50) {
-            gap -= 5;
-            System.out.println(gap);
+        if(this.gap > 50) {
+            this.gap -= 5;
+            System.out.println(this.gap);
         }
     }
 
