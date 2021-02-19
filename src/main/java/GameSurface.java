@@ -16,11 +16,13 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     private int speed = -5;
     private boolean gameOver = false;
     private int score;
-    private List<Player> highScore = new ArrayList<>();
+    private List<Player> highScore;
 
 
     // När en Gamesurface skapas med en viss storlek, skapas obstacles
     public GameSurface(final int width, final int height) {
+
+        highScore = SaveAndLoad.loadHighScore();
         score = 0;
 
         // hur ser avataren som du styr ut, här en rektangel  från JFrame?
@@ -108,15 +110,14 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
             // när obstacle är utanför bild, lägg i tabort-listan
             if (obstacle.x < -150) {
-                System.out.println("tar bort");
+
                 toRemove.add(obstacle);
 
                 if (obstacle.y == 0) {
                     addObstacles();
-                    System.out.println("Här läggs det till obstacles");
                     obstacles.removeAll(toRemove);
                 }
-                System.out.println(toRemove.toString() + " toRemove");
+
             }
 
             if (birb.intersects(obstacle) || birb.y > 600) {
@@ -130,6 +131,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             }
 
         }
+
 
         // gör att fåglen faller.
         birb.translate(0, +2);
@@ -172,7 +174,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         final int kc = e.getKeyCode();
 
         if (gameOver == true && kc == KeyEvent.VK_SPACE) {
-            System.out.println("klickade efter game over");
+
             restart();
         }
     }
@@ -196,7 +198,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
         highScore.add(new Player(input, score));
         highScore.sort(new ScoreComparator().reversed());
-        System.out.println(highScore);
+        SaveAndLoad.saveHighScore(highScore);
     }
 
     public void calHighScore(int score) {
