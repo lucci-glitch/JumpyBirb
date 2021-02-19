@@ -15,11 +15,15 @@ public class Main {
         int initGap = 200;
         int initDelay = 30;
 
-        if (args[0].equals("hard")) {
-            System.out.println(args[0]);
-            initGap = 125;
-            initDelay = 15;
+        if(args.length != 0) {
+
+            if (args[0].equals("hard")) {
+                System.out.println(args[0]);
+                initGap = 125;
+                initDelay = 15;
+            }
         }
+
         System.out.println("initGap " + initGap + " initDelay " + initDelay);
 
         JFrame main = new JFrame("Jumpy Birb");
