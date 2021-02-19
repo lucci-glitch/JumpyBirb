@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
@@ -14,6 +15,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     private Rectangle birb;
     private List<Rectangle> obstacles;
     private int speed = -5;
+    private int gap = 200;
     private boolean gameOver = false;
     private int score;
     private List<Player> highScore;
@@ -50,8 +52,14 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
     // obstacles skapas med en position och en storlek
     private void addObstacles() {
-        obstacles.add(new Rectangle(1000, 400, 150, 200));
-        obstacles.add(new Rectangle(1000, 0, 150, 200));
+
+        int max = 600;
+        int random = ThreadLocalRandom.current().nextInt(20, (max-gap));
+        int top = random;
+        int bot = max - gap - random;
+
+        obstacles.add(new Rectangle(1000, max-bot, 150, bot));
+        obstacles.add(new Rectangle(1000, 0, 150, top));
     }
 
 
@@ -128,6 +136,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
                 score++;
                 System.out.println(score + "score");
                 increaseSpeed();
+                decreaseGap();
             }
 
         }
@@ -144,6 +153,13 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     public void increaseSpeed() {
         if (timer.getDelay() > 0) {
             timer.setDelay(timer.getDelay() - 1);
+        }
+    }
+
+    public void decreaseGap() {
+        if(gap > 50) {
+            gap -= 5;
+            System.out.println(gap);
         }
     }
 
@@ -181,14 +197,15 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
     public void restart() {
         gameOver = false;
-        this.birb = new Rectangle(20, 1000 / 2 - 15, 30, 20);
-
-        this.obstacles = new ArrayList<>();
         this.score = 0;
 
-        addObstacles();
+        this.birb = new Rectangle(20, 1000 / 2 - 15, 30, 20);
+        this.obstacles = new ArrayList<>();
 
+        addObstacles();
         repaint();
+
+        this.gap = 200;
         this.timer.setDelay(20);
         this.timer.start();
     }
