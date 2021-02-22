@@ -1,3 +1,5 @@
+import jdk.swing.interop.SwingInterOpUtils;
+
 import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.*;
@@ -29,7 +31,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
         // hur ser avataren som du styr ut, här en rektangel  från JFrame?
         // och vilken x- och y-position börjar den på (två första)
-        this.birb = new Rectangle(20, width / 2 - 15, 30, 20);
+        this.birb = new Rectangle(70, 100, 75, 85);
         this.obstacles = new ArrayList<>();
         this.gap = gap;
 
@@ -61,15 +63,26 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         obstacles.add(new Rectangle(1000, 0, 150, top));
     }
 
+    // Nighttime + tumbleweed
+    Image backgroundImage = makeImage("images/desertLightningBlue.jpg");
+    Image gameOverImage = makeImage("images/gameOverImageNight2.jpg");
+    Image obstacleImage = makeImage("images/tumbleweed.png");
+    Image birbImage = makeImage("images/redHawkWingsUpNight.png");
+
+/*  Image backgroundImage = makeImage("images/mexicoDesert.jpg");
+    Image gameOverImage = makeImage("images/gameOverImageDay.jpg");
+    Image obstacleImage = makeImage(images/"tumbleweed.png");
+    Image birbImage = makeImage("images/redHawkSunWingsUp.png");*/
 
     private void repaint(Graphics g) {
         final Dimension d = this.getSize();
 
         if (gameOver) {
             calHighScore(score);
-            g.setColor(new Color(0x0000FF, false));
-            g.fillRect(0, 0, d.width, d.height);
-            g.setColor(Color.white);
+            g.drawImage(gameOverImage, 0, 0, d.width, d.height, null);
+            /*g.setColor(new Color(0x0000FF, false));
+            g.fillRect(0, 0, d.width, d.height);*/
+            g.setColor(Color.decode("#d3d5eb"));
             g.setFont(new Font("Arial", Font.BOLD, 32));
 
 
@@ -82,20 +95,26 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         }
 
         // fill the background
-        g.setColor(Color.blue);
-        g.fillRect(0, 0, d.width, d.height);
+        g.drawImage(backgroundImage, 0, 0, this.getWidth(), this.getHeight(), this);
 
         // fill the obstacles
         for (Rectangle obstacle : obstacles) {
-            g.setColor(Color.pink);
-            g.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            g.drawImage(obstacleImage, obstacle.x, obstacle.y, obstacle.width, obstacle.height, null);
+            /*g.setColor(Color.pink);
+            g.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);*/
         }
 
-        // draw the space ship
-        g.setColor(Color.black);
-        g.fillRect(birb.x, birb.y, birb.width, birb.height);
+        // fill the obstacles
+        g.drawImage(birbImage, birb.x, birb.y, birb.width, birb.height, null);
+        /*g.setColor(Color.black);
+        g.fillRect(birb.x, birb.y, birb.width, birb.height);*/
     }
 
+    public Image makeImage(String filename) {
+        ImageIcon imageIcon = new ImageIcon(filename);
+        Image image = imageIcon.getImage();
+        return image;
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -144,6 +163,12 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         // gör att fåglen faller.
         birb.translate(0, +2);
 
+        // för att birben ska kunna dö när den når marken
+        final int minHeight = 500;
+        if (birb.y > minHeight) {
+            gameOver = true;
+        }
+
         // samma bakgrund osv som innan
         this.repaint();
 
@@ -167,14 +192,15 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
 
-        final int maxHeight = this.getSize().height - birb.height - 10;
-        final int minHeight = 20;
+        final int maxHeight = 20;
+        /*final int minHeight = 200;*/
 
 
         final int kc = e.getKeyCode();
 
-        if (kc == KeyEvent.VK_SPACE && birb.y > minHeight) {
-            birb.translate(0, -100);
+        if (kc == KeyEvent.VK_SPACE && birb.y > maxHeight) {
+            //kolla hur mycket den flyger uppåt, ändrade från -100
+            birb.translate(0, -75);
         }
     }
 
@@ -222,9 +248,9 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         if (highScore.size() == 10 && highScore.get(highScore.size() - 1).getScore() < score) {
             highScore.remove(highScore.size() - 1);
             this.createPlayer(score);
-            return;
+        } else if (highScore.size() < 10) {
+            this.createPlayer(score);
         }
-        this.createPlayer(score);
     }
 
 
