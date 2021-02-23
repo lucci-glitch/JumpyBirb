@@ -84,7 +84,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             /*g.setColor(new Color(0x0000FF, false));
             g.fillRect(0, 0, d.width, d.height);*/
             g.setColor(Color.decode("#d3d5eb"));
-            g.setFont(new Font("Arial", Font.BOLD, 32));
+            g.setFont(new Font("Arial", Font.BOLD, 21));
 
 
             int pos = 100;
@@ -176,7 +176,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     }
 
     public void increaseSpeed() {
-        if (timer.getDelay() > 0) {
+        if (timer.getDelay() > 4) {
             timer.setDelay(timer.getDelay() - 1);
         }
         System.out.println(timer.getDelay());
@@ -261,7 +261,8 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     }
 
     public void createPlayer(int score) {
-        String input = JOptionPane.showInputDialog("Skriv ditt namn");
+
+        String input = JOptionPane.showInputDialog("Skriv ditt namn").trim();
 
         highScore.add(new Player(input, score));
         highScore.sort(new ScoreComparator().reversed());
