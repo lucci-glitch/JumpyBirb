@@ -13,22 +13,20 @@ public class Main {
     final private static int HEIGHT = 600;
     public static void main(String[] args) {
 
-        int initGap = 200;
-        int initDelay = 30;
+        Enum<Difficulty> diff = Difficulty.EASY;
 
         if(args.length != 0) {
 
             if (args[0].equals("hard")) {
                 System.out.println(args[0]);
-                initGap = 125;
-                initDelay = 15;
+                diff = Difficulty.HARD;
             }
         }
 
-        System.out.println("initGap " + initGap + " initDelay " + initDelay);
+        System.out.println("DIFF: " + diff);
 
         JFrame main = new JFrame("Jumpy Birb");
-        GameSurface gs = new GameSurface(WIDTH, HEIGHT, initGap, initDelay);
+        GameSurface gs = new GameSurface(WIDTH, HEIGHT, diff);
 
         main.setSize(WIDTH, HEIGHT);
         main.setResizable(false);

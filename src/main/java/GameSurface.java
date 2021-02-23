@@ -13,35 +13,42 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
-    private Timer timer;
+    private final Timer timer;
+    private final int speed = -5;
+    private final List<Player> highScore;
+    // Nighttime + tumbleweed
+    Image backgroundImage = makeImage("images/desertLightningBlue.jpg");
+    Image gameOverImage = makeImage("images/gameOverImageNight2.jpg");
+    Image obstacleImage = makeImage("images/tumbleweed.png");
+    Image birbImage = makeImage("images/redHawkWingsUpNight.png");
     private Rectangle birb;
     private List<Rectangle> obstacles;
-    private int speed = -5;
     private boolean gameOver = false;
     private int score;
-    private List<Player> highScore;
     private int gap;
-
+    private Enum<Difficulty> difficulty;
 
     // När en Gamesurface skapas med en viss storlek, skapas obstacles
-    public GameSurface(final int width, final int height, int gap, int delay) {
+    public GameSurface(final int width, final int height, final Enum<Difficulty> diff) {
 
         highScore = SaveAndLoad.loadHighScore();
         score = 0;
 
         // hur ser avataren som du styr ut, här en rektangel  från JFrame?
         // och vilken x- och y-position börjar den på (två första)
-        this.birb = new Rectangle(70, 100, 75, 85);
+        this.birb = new Rectangle(70, 100, 60, 70);
         this.obstacles = new ArrayList<>();
-        this.gap = gap;
 
+        this.difficulty = diff;
+
+        diffGap();
         addObstacles();
 
         // hur lång tid det tar för hela fönstret att röra sig
         // Fires one or more ActionEvents at specified intervals. Används alltså tillsammans med en ActionEvent
         // An example use is an animation object that uses a Timer as the trigger for drawing its frames.
         // this i (10, this) hänvisar till den här actionListenern
-        this.timer = new Timer(delay, this);
+        this.timer = new Timer(diffDelay(), this);
         this.timer.start();
     }
 
@@ -63,16 +70,10 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         obstacles.add(new Rectangle(1000, 0, 150, top));
     }
 
-    // Nighttime + tumbleweed
-    Image backgroundImage = makeImage("images/desertLightningBlue.jpg");
-    Image gameOverImage = makeImage("images/gameOverImageNight2.jpg");
-    Image obstacleImage = makeImage("images/tumbleweed.png");
-    Image birbImage = makeImage("images/redHawkWingsUpNight.png");
-    Image birbImage2 = makeImage("images/redHawkSunWingsDown.png");
 /*  Image backgroundImage = makeImage("images/mexicoDesert.jpg");
     Image gameOverImage = makeImage("images/gameOverImageDay.jpg");
     Image obstacleImage = makeImage(images/"tumbleweed.png");
-    */
+    Image birbImage = makeImage("images/redHawkSunWingsUp.png");*/
 
     private void repaint(Graphics g) {
         final Dimension d = this.getSize();
@@ -83,7 +84,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             /*g.setColor(new Color(0x0000FF, false));
             g.fillRect(0, 0, d.width, d.height);*/
             g.setColor(Color.decode("#d3d5eb"));
-            g.setFont(new Font("Arial", Font.BOLD, 32));
+            g.setFont(new Font("Arial", Font.BOLD, 21));
 
 
             int pos = 100;
@@ -102,24 +103,12 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             g.drawImage(obstacleImage, obstacle.x, obstacle.y, obstacle.width, obstacle.height, null);
             /*g.setColor(Color.pink);
             g.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);*/
-
         }
 
         // fill the obstacles
-        makeBirdFlapp(g);
-        //g.drawImage(birbImage, birb.x, birb.y, birb.width, birb.height, null);
+        g.drawImage(birbImage, birb.x, birb.y, birb.width, birb.height, null);
         /*g.setColor(Color.black);
         g.fillRect(birb.x, birb.y, birb.width, birb.height);*/
-    }
-
-    public void makeBirdFlapp(Graphics g) {
-
-            if (birb.y % 2 == 0) {
-                g.drawImage(birbImage2, birb.x, birb.y, birb.width, birb.height, null);
-            } else {
-                g.drawImage(birbImage, birb.x, birb.y, birb.width, birb.height, null);
-            }
-
     }
 
     public Image makeImage(String filename) {
@@ -187,8 +176,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     }
 
     public void increaseSpeed() {
-
-        if (timer.getDelay() > 0) {
+        if (timer.getDelay() > 4) {
             timer.setDelay(timer.getDelay() - 1);
         }
         System.out.println(timer.getDelay());
@@ -238,19 +226,43 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         gameOver = false;
         this.score = 0;
 
-        this.birb = new Rectangle(20, 1000 / 2 - 15, 30, 20);
+        this.birb = new Rectangle(70, 100, 60, 70);
         this.obstacles = new ArrayList<>();
 
+        diffGap();
         addObstacles();
         repaint();
 
-        this.gap = 200;
-        this.timer.setDelay(20);
+        this.timer.setDelay(diffDelay());
         this.timer.start();
     }
 
+    public void diffGap() {
+        if(getDifficulty().equals(Difficulty.HARD)) {
+            this.gap = 200;
+        } else {
+            this.gap = 400;
+        }
+    }
+
+    public int diffDelay() {
+        int delay;
+        if(getDifficulty().equals(Difficulty.HARD)) {
+            delay = 15;
+        }
+        else {
+            delay = 30;
+        }
+        return delay;
+    }
+
+    public Enum<Difficulty> getDifficulty() {
+        return difficulty;
+    }
+
     public void createPlayer(int score) {
-        String input = JOptionPane.showInputDialog("Skriv ditt namn");
+
+        String input = JOptionPane.showInputDialog("Skriv ditt namn").trim();
 
         highScore.add(new Player(input, score));
         highScore.sort(new ScoreComparator().reversed());
