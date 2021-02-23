@@ -21,6 +21,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     Image gameOverImage = makeImage("images/gameOverImageNight2.jpg");
     Image obstacleImage = makeImage("images/tumbleweed.png");
     Image birbImage = makeImage("images/redHawkWingsUpNight.png");
+    Image birbImage2 = makeImage("images/redHawkSunWingsDown.png");
     private Rectangle birb;
     private List<Rectangle> obstacles;
     private boolean gameOver = false;
@@ -106,9 +107,19 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         }
 
         // fill the obstacles
-        g.drawImage(birbImage, birb.x, birb.y, birb.width, birb.height, null);
+        makebirdflapp(g);
+        //g.drawImage(birbImage, birb.x, birb.y, birb.width, birb.height, null);
         /*g.setColor(Color.black);
         g.fillRect(birb.x, birb.y, birb.width, birb.height);*/
+    }
+
+    public void makebirdflapp(Graphics g){
+
+        if(birb.y%2==0){
+            g.drawImage(birbImage2, birb.x, birb.y, birb.width, birb.height, null);
+        }else{
+            g.drawImage(birbImage, birb.x, birb.y, birb.width, birb.height, null);
+        }
     }
 
     public Image makeImage(String filename) {
