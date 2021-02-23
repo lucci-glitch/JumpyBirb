@@ -55,11 +55,11 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     private void addObstacles() {
 
         int max = 600;
-        int random = ThreadLocalRandom.current().nextInt(20, (max-gap));
+        int random = ThreadLocalRandom.current().nextInt(20, (max - gap));
         int top = random;
         int bot = max - gap - random;
 
-        obstacles.add(new Rectangle(1000, max-bot, 150, bot));
+        obstacles.add(new Rectangle(1000, max - bot, 150, bot));
         obstacles.add(new Rectangle(1000, 0, 150, top));
     }
 
@@ -68,11 +68,11 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     Image gameOverImage = makeImage("images/gameOverImageNight2.jpg");
     Image obstacleImage = makeImage("images/tumbleweed.png");
     Image birbImage = makeImage("images/redHawkWingsUpNight.png");
-
+    Image birbImage2 = makeImage("images/redHawkSunWingsDown.png");
 /*  Image backgroundImage = makeImage("images/mexicoDesert.jpg");
     Image gameOverImage = makeImage("images/gameOverImageDay.jpg");
     Image obstacleImage = makeImage(images/"tumbleweed.png");
-    Image birbImage = makeImage("images/redHawkSunWingsUp.png");*/
+    */
 
     private void repaint(Graphics g) {
         final Dimension d = this.getSize();
@@ -102,12 +102,24 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             g.drawImage(obstacleImage, obstacle.x, obstacle.y, obstacle.width, obstacle.height, null);
             /*g.setColor(Color.pink);
             g.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);*/
+
         }
 
         // fill the obstacles
-        g.drawImage(birbImage, birb.x, birb.y, birb.width, birb.height, null);
+        makeBirdFlapp(g);
+        //g.drawImage(birbImage, birb.x, birb.y, birb.width, birb.height, null);
         /*g.setColor(Color.black);
         g.fillRect(birb.x, birb.y, birb.width, birb.height);*/
+    }
+
+    public void makeBirdFlapp(Graphics g) {
+
+            if (birb.y % 2 == 0) {
+                g.drawImage(birbImage2, birb.x, birb.y, birb.width, birb.height, null);
+            } else {
+                g.drawImage(birbImage, birb.x, birb.y, birb.width, birb.height, null);
+            }
+
     }
 
     public Image makeImage(String filename) {
@@ -175,6 +187,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     }
 
     public void increaseSpeed() {
+
         if (timer.getDelay() > 0) {
             timer.setDelay(timer.getDelay() - 1);
         }
@@ -182,7 +195,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     }
 
     public void decreaseGap() {
-        if(this.gap > 50) {
+        if (this.gap > 50) {
             this.gap -= 5;
             System.out.println(this.gap);
         }
