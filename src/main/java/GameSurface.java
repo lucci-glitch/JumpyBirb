@@ -13,35 +13,42 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
-    private Timer timer;
+    private final Timer timer;
+    private final int speed = -5;
+    private final List<Player> highScore;
+    // Nighttime + tumbleweed
+    Image backgroundImage = makeImage("images/desertLightningBlue.jpg");
+    Image gameOverImage = makeImage("images/gameOverImageNight2.jpg");
+    Image obstacleImage = makeImage("images/tumbleweed.png");
+    Image birbImage = makeImage("images/redHawkWingsUpNight.png");
     private Rectangle birb;
     private List<Rectangle> obstacles;
-    private int speed = -5;
     private boolean gameOver = false;
     private int score;
-    private List<Player> highScore;
     private int gap;
-
+    private Enum<Difficulty> difficulty;
 
     // När en Gamesurface skapas med en viss storlek, skapas obstacles
-    public GameSurface(final int width, final int height, int gap, int delay) {
+    public GameSurface(final int width, final int height, final Enum<Difficulty> diff) {
 
         highScore = SaveAndLoad.loadHighScore();
         score = 0;
 
         // hur ser avataren som du styr ut, här en rektangel  från JFrame?
         // och vilken x- och y-position börjar den på (två första)
-        this.birb = new Rectangle(70, 100, 75, 85);
+        this.birb = new Rectangle(70, 100, 60, 70);
         this.obstacles = new ArrayList<>();
-        this.gap = gap;
 
+        this.difficulty = diff;
+
+        diffGap();
         addObstacles();
 
         // hur lång tid det tar för hela fönstret att röra sig
         // Fires one or more ActionEvents at specified intervals. Används alltså tillsammans med en ActionEvent
         // An example use is an animation object that uses a Timer as the trigger for drawing its frames.
         // this i (10, this) hänvisar till den här actionListenern
-        this.timer = new Timer(delay, this);
+        this.timer = new Timer(diffDelay(), this);
         this.timer.start();
     }
 
@@ -55,19 +62,13 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     private void addObstacles() {
 
         int max = 600;
-        int random = ThreadLocalRandom.current().nextInt(20, (max-gap));
+        int random = ThreadLocalRandom.current().nextInt(20, (max - gap));
         int top = random;
         int bot = max - gap - random;
 
-        obstacles.add(new Rectangle(1000, max-bot, 150, bot));
+        obstacles.add(new Rectangle(1000, max - bot, 150, bot));
         obstacles.add(new Rectangle(1000, 0, 150, top));
     }
-
-    // Nighttime + tumbleweed
-    Image backgroundImage = makeImage("images/desertLightningBlue.jpg");
-    Image gameOverImage = makeImage("images/gameOverImageNight2.jpg");
-    Image obstacleImage = makeImage("images/tumbleweed.png");
-    Image birbImage = makeImage("images/redHawkWingsUpNight.png");
 
 /*  Image backgroundImage = makeImage("images/mexicoDesert.jpg");
     Image gameOverImage = makeImage("images/gameOverImageDay.jpg");
@@ -182,7 +183,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     }
 
     public void decreaseGap() {
-        if(this.gap > 50) {
+        if (this.gap > 50) {
             this.gap -= 5;
             System.out.println(this.gap);
         }
@@ -225,15 +226,38 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         gameOver = false;
         this.score = 0;
 
-        this.birb = new Rectangle(20, 1000 / 2 - 15, 30, 20);
+        this.birb = new Rectangle(70, 100, 60, 70);
         this.obstacles = new ArrayList<>();
 
+        diffGap();
         addObstacles();
         repaint();
 
-        this.gap = 200;
-        this.timer.setDelay(20);
+        this.timer.setDelay(diffDelay());
         this.timer.start();
+    }
+
+    public void diffGap() {
+        if(getDifficulty().equals(Difficulty.HARD)) {
+            this.gap = 200;
+        } else {
+            this.gap = 400;
+        }
+    }
+
+    public int diffDelay() {
+        int delay;
+        if(getDifficulty().equals(Difficulty.HARD)) {
+            delay = 15;
+        }
+        else {
+            delay = 30;
+        }
+        return delay;
+    }
+
+    public Enum<Difficulty> getDifficulty() {
+        return difficulty;
     }
 
     public void createPlayer(int score) {
