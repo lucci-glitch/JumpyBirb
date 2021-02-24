@@ -14,12 +14,14 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     private final int speed = -5;
     private final Timer timer;
     private final List<Player> highScore;
-    // Nighttime + tumbleweed
-    Image backgroundImage = makeImage("images/desertLightningBlue.jpg");
-    Image gameOverImage = makeImage("images/gameOverImageNight2.jpg");
-    Image obstacleImage = makeImage("images/tumbleweed.png");
-    Image birbImage = makeImage("images/redHawkWingsUpNight.png");
-    Image birbImage2 = makeImage("images/redHawkSunWingsDown.png");
+    private Image background;
+    private Image birbWingsUp;
+    private Image birbWingsDown;
+    private Image tumbleweed;
+    private Image gameOverScreen;
+
+
+
     private boolean gameOver = false;
     private Rectangle birb;
     private List<Rectangle> obstacles;
@@ -27,10 +29,6 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     private int gap;
     private Enum<Difficulty> difficulty;
     private int delay;
-/*  Image backgroundImage = makeImage("images/mexicoDesert.jpg");
-    Image gameOverImage = makeImage("images/gameOverImageDay.jpg");
-    Image obstacleImage = makeImage(images/"tumbleweed.png");
-    Image birbImage = makeImage("images/redHawkSunWingsUp.png");*/
 
 
     public GameSurface(final int width, final int height, final Enum<Difficulty> difficulty) {
@@ -71,7 +69,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
         if (gameOver) {
             addToHighScoreList(score);
-            g.drawImage(gameOverImage, 0, 0, d.width, d.height, null);
+            g.drawImage(gameOverScreen, 0, 0, d.width, d.height, null);
             g.setColor(Color.decode("#d3d5eb"));
             g.setFont(new Font("Arial", Font.BOLD, 21));
 
@@ -84,10 +82,10 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             return;
         }
 
-        g.drawImage(backgroundImage, 0, 0, this.getWidth(), this.getHeight(), this);
+        g.drawImage(background, 0, 0, this.getWidth(), this.getHeight(), this);
 
         for (Rectangle obstacle : obstacles) {
-            g.drawImage(obstacleImage, obstacle.x, obstacle.y, obstacle.width, obstacle.height, null);
+            g.drawImage(tumbleweed, obstacle.x, obstacle.y, obstacle.width, obstacle.height, null);
 
         }
 
@@ -97,9 +95,9 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
     public void makeBirdFlap(Graphics g) {
         if (birb.y % 2 == 0) {
-            g.drawImage(birbImage2, birb.x, birb.y, birb.width, birb.height, null);
+            g.drawImage(birbWingsDown, birb.x, birb.y, birb.width, birb.height, null);
         } else {
-            g.drawImage(birbImage, birb.x, birb.y, birb.width, birb.height, null);
+            g.drawImage(birbWingsUp, birb.x, birb.y, birb.width, birb.height, null);
         }
     }
 
@@ -231,9 +229,19 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         if (difficulty.equals(Difficulty.HARD)) {
             gap = 200;
             delay = 15;
+            background = makeImage("images/backgroundNight.jpg");
+            gameOverScreen = makeImage("images/gameOverNight.jpg");
+            tumbleweed = makeImage("images/tumbleweedNight.png");
+            birbWingsUp = makeImage("images/birbNightWingsUp.png");
+            birbWingsDown = makeImage("images/birbNightWingsDown.png");
         } else {
             gap = 400;
             delay = 30;
+            background = makeImage("images/backgroundDay.jpg");
+            gameOverScreen = makeImage("images/gameOverDay.jpg");
+            tumbleweed = makeImage("images/tumbleweedDay.png");
+            birbWingsUp = makeImage("images/birbDayWingsUp.png");
+            birbWingsDown = makeImage("images/birbDayWingsDown.png");
         }
     }
 
