@@ -1,11 +1,10 @@
 import javax.swing.*;
-import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -13,22 +12,21 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
     private final List<Rectangle> toRemove = new ArrayList<>();
     private final int speed = -5;
-    private boolean gameOver = false;
     private final Timer timer;
     private final List<Player> highScore;
-    private Rectangle birb;
-    private List<Rectangle> obstacles;
-    private int score;
-    private int gap;
-    private Enum<Difficulty> difficulty;
-    private int delay;
-
     // Nighttime + tumbleweed
     Image backgroundImage = makeImage("images/desertLightningBlue.jpg");
     Image gameOverImage = makeImage("images/gameOverImageNight2.jpg");
     Image obstacleImage = makeImage("images/tumbleweed.png");
     Image birbImage = makeImage("images/redHawkWingsUpNight.png");
     Image birbImage2 = makeImage("images/redHawkSunWingsDown.png");
+    private boolean gameOver = false;
+    private Rectangle birb;
+    private List<Rectangle> obstacles;
+    private int score;
+    private int gap;
+    private Enum<Difficulty> difficulty;
+    private int delay;
 /*  Image backgroundImage = makeImage("images/mexicoDesert.jpg");
     Image gameOverImage = makeImage("images/gameOverImageDay.jpg");
     Image obstacleImage = makeImage(images/"tumbleweed.png");
