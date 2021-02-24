@@ -11,22 +11,20 @@ import static javax.swing.JFrame.EXIT_ON_CLOSE;
 public class Main {
     final private static int WIDTH = 1000;
     final private static int HEIGHT = 600;
+
     public static void main(String[] args) {
 
-        Enum<Difficulty> diff = Difficulty.EASY;
+        Enum<Difficulty> difficulty = Difficulty.EASY;
 
-        if(args.length != 0) {
+        if (args.length != 0) {
 
-            if (args[0].equals("hard")) {
-                System.out.println(args[0]);
-                diff = Difficulty.HARD;
+            if (args[0].equalsIgnoreCase("hard")) {
+                difficulty = Difficulty.HARD;
             }
         }
 
-        System.out.println("DIFF: " + diff);
-
         JFrame main = new JFrame("Jumpy Birb");
-        GameSurface gs = new GameSurface(WIDTH, HEIGHT, diff);
+        GameSurface gs = new GameSurface(WIDTH, HEIGHT, difficulty);
 
         main.setSize(WIDTH, HEIGHT);
         main.setResizable(false);
@@ -36,12 +34,11 @@ public class Main {
         main.setVisible(true);
 
 
-
-       // music();
+        music();
 
     }
 
-    private static void music() {
+    public static void music() {
         try {
             File filePath = new File("Flappy.wav");
 
@@ -49,8 +46,6 @@ public class Main {
                 AudioInputStream audioInput = AudioSystem.getAudioInputStream(filePath);
                 Clip clip = AudioSystem.getClip();
                 clip.open(audioInput);
-                // FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-                // gainControl.setValue(getVolume());
                 clip.loop(Clip.LOOP_CONTINUOUSLY);
                 clip.start();
             } else {

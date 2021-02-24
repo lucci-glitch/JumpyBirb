@@ -1,5 +1,3 @@
-import jdk.swing.interop.SwingInterOpUtils;
-
 import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.*;
@@ -13,44 +11,44 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
-    private final Timer timer;
+    private final List<Rectangle> toRemove = new ArrayList<>();
     private final int speed = -5;
+    private boolean gameOver = false;
+    private final Timer timer;
     private final List<Player> highScore;
+    private Rectangle birb;
+    private List<Rectangle> obstacles;
+    private int score;
+    private int gap;
+    private Enum<Difficulty> difficulty;
+    private int delay;
+
     // Nighttime + tumbleweed
     Image backgroundImage = makeImage("images/desertLightningBlue.jpg");
     Image gameOverImage = makeImage("images/gameOverImageNight2.jpg");
     Image obstacleImage = makeImage("images/tumbleweed.png");
     Image birbImage = makeImage("images/redHawkWingsUpNight.png");
     Image birbImage2 = makeImage("images/redHawkSunWingsDown.png");
-    private Rectangle birb;
-    private List<Rectangle> obstacles;
-    private boolean gameOver = false;
-    private int score;
-    private int gap;
-    private Enum<Difficulty> difficulty;
+/*  Image backgroundImage = makeImage("images/mexicoDesert.jpg");
+    Image gameOverImage = makeImage("images/gameOverImageDay.jpg");
+    Image obstacleImage = makeImage(images/"tumbleweed.png");
+    Image birbImage = makeImage("images/redHawkSunWingsUp.png");*/
 
-    // När en Gamesurface skapas med en viss storlek, skapas obstacles
-    public GameSurface(final int width, final int height, final Enum<Difficulty> diff) {
 
-        highScore = SaveAndLoad.loadHighScore();
-        score = 0;
+    public GameSurface(final int width, final int height, final Enum<Difficulty> difficulty) {
 
-        // hur ser avataren som du styr ut, här en rektangel  från JFrame?
-        // och vilken x- och y-position börjar den på (två första)
+        this.highScore = SaveAndLoad.loadHighScore();
+        this.score = 0;
         this.birb = new Rectangle(70, 100, 60, 70);
         this.obstacles = new ArrayList<>();
+        this.difficulty = difficulty;
 
-        this.difficulty = diff;
-
-        diffGap();
+        setupDifficulty();
         addObstacles();
 
-        // hur lång tid det tar för hela fönstret att röra sig
-        // Fires one or more ActionEvents at specified intervals. Används alltså tillsammans med en ActionEvent
-        // An example use is an animation object that uses a Timer as the trigger for drawing its frames.
-        // this i (10, this) hänvisar till den här actionListenern
-        this.timer = new Timer(diffDelay(), this);
+        this.timer = new Timer(delay, this);
         this.timer.start();
+
     }
 
     @Override
@@ -59,65 +57,50 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         repaint(g);
     }
 
-    // obstacles skapas med en position och en storlek
     private void addObstacles() {
 
-        int max = 600;
-        int random = ThreadLocalRandom.current().nextInt(20, (max - gap));
-        int top = random;
-        int bot = max - gap - random;
+        int maxHeight = 600;
+        int topObstacleHeight = ThreadLocalRandom.current().nextInt(20, (maxHeight - gap));
+        int bottomObstacleHeight = maxHeight - gap - topObstacleHeight;
 
-        obstacles.add(new Rectangle(1000, max - bot, 150, bot));
-        obstacles.add(new Rectangle(1000, 0, 150, top));
+        obstacles.add(new Rectangle(1000, maxHeight - bottomObstacleHeight, 150, bottomObstacleHeight));
+        obstacles.add(new Rectangle(1000, 0, 150, topObstacleHeight));
     }
 
-/*  Image backgroundImage = makeImage("images/mexicoDesert.jpg");
-    Image gameOverImage = makeImage("images/gameOverImageDay.jpg");
-    Image obstacleImage = makeImage(images/"tumbleweed.png");
-    Image birbImage = makeImage("images/redHawkSunWingsUp.png");*/
 
     private void repaint(Graphics g) {
         final Dimension d = this.getSize();
 
         if (gameOver) {
-            calHighScore(score);
+            addToHighScoreList(score);
             g.drawImage(gameOverImage, 0, 0, d.width, d.height, null);
-            /*g.setColor(new Color(0x0000FF, false));
-            g.fillRect(0, 0, d.width, d.height);*/
             g.setColor(Color.decode("#d3d5eb"));
             g.setFont(new Font("Arial", Font.BOLD, 21));
 
 
-            int pos = 100;
+            int highscoreTextPosition = 100;
             for (Player gamer : highScore) {
-                g.drawString(gamer.toString(), 100, pos);
-                pos += 42;
+                g.drawString(gamer.toString(), 100, highscoreTextPosition);
+                highscoreTextPosition += 42;
             }
             return;
         }
 
-        // fill the background
         g.drawImage(backgroundImage, 0, 0, this.getWidth(), this.getHeight(), this);
 
-        // fill the obstacles
         for (Rectangle obstacle : obstacles) {
             g.drawImage(obstacleImage, obstacle.x, obstacle.y, obstacle.width, obstacle.height, null);
-            /*g.setColor(Color.pink);
-            g.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);*/
+
         }
 
-        // fill the obstacles
-        makebirdflapp(g);
-        //g.drawImage(birbImage, birb.x, birb.y, birb.width, birb.height, null);
-        /*g.setColor(Color.black);
-        g.fillRect(birb.x, birb.y, birb.width, birb.height);*/
+        makeBirdFlap(g);
+
     }
 
-    public void makebirdflapp(Graphics g){
-
-        if(birb.y%2==0){
+    public void makeBirdFlap(Graphics g) {
+        if (birb.y % 2 == 0) {
             g.drawImage(birbImage2, birb.x, birb.y, birb.width, birb.height, null);
-        }else{
+        } else {
             g.drawImage(birbImage, birb.x, birb.y, birb.width, birb.height, null);
         }
     }
@@ -130,60 +113,60 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // this will trigger on the timer event
-        // if the game is not over yet it will
-        // update the positions of all obstacles
-        // and check for collision with the birb
 
         if (gameOver) {
             timer.stop();
             return;
         }
 
-        // lista över obstacles som simmat ur bild
-        final List<Rectangle> toRemove = new ArrayList<>();
-
         for (Rectangle obstacle : obstacles) {
             obstacle.translate(speed, 0);
 
-            // när obstacle är utanför bild, lägg i tabort-listan
-            if (obstacle.x < -150) {
+            recycleObstacles(obstacle);
 
-                toRemove.add(obstacle);
+            collisionDetector(obstacle);
 
-                if (obstacle.y == 0) {
-                    addObstacles();
-                    obstacles.removeAll(toRemove);
-                }
-
-            }
-
-            if (birb.intersects(obstacle) || birb.y > 600) {
-                gameOver = true;
-            }
-
-            if (obstacle.y == 0 && (obstacle.x + 150) == 20 && !gameOver) {
-                score++;
-                System.out.println(score + "score");
-                increaseSpeed();
-                decreaseGap();
-            }
+            addScore(obstacle);
 
         }
 
-
-        // gör att fåglen faller.
         birb.translate(0, +2);
 
-        // för att birben ska kunna dö när den når marken
         final int minHeight = 500;
         if (birb.y > minHeight) {
             gameOver = true;
         }
 
-        // samma bakgrund osv som innan
         this.repaint();
 
+    }
+
+    private void collisionDetector(Rectangle obstacle) {
+        if (birb.intersects(obstacle) || birb.y > 600) {
+            gameOver = true;
+        }
+    }
+
+    private void recycleObstacles(Rectangle obstacle) {
+        if (obstacle.x < -150) {
+
+            toRemove.add(obstacle);
+
+            if (obstacle.y == 0) {
+                addObstacles();
+                obstacles.removeAll(toRemove);
+            }
+
+        }
+    }
+
+    private void addScore(Rectangle obstacle) {
+        if (obstacle.y == 0 && (obstacle.x + 150) == 20 && !gameOver) {
+            score++;
+            System.out.println(score + "score");
+            increaseSpeed();
+            decreaseGap();
+        }
     }
 
     public void increaseSpeed() {
@@ -205,13 +188,10 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     public void keyReleased(KeyEvent e) {
 
         final int maxHeight = 20;
-        /*final int minHeight = 200;*/
-
 
         final int kc = e.getKeyCode();
 
         if (kc == KeyEvent.VK_SPACE && birb.y > maxHeight) {
-            //kolla hur mycket den flyger uppåt, ändrade från -100
             birb.translate(0, -75);
         }
     }
@@ -234,45 +214,32 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     }
 
     public void restart() {
-        gameOver = false;
+        this.gameOver = false;
         this.score = 0;
 
         this.birb = new Rectangle(70, 100, 60, 70);
         this.obstacles = new ArrayList<>();
 
-        diffGap();
+        setupDifficulty();
         addObstacles();
         repaint();
 
-        this.timer.setDelay(diffDelay());
+
+        this.timer.setDelay(delay);
         this.timer.start();
     }
 
-    public void diffGap() {
-        if(getDifficulty().equals(Difficulty.HARD)) {
-            this.gap = 200;
-        } else {
-            this.gap = 400;
-        }
-    }
-
-    public int diffDelay() {
-        int delay;
-        if(getDifficulty().equals(Difficulty.HARD)) {
+    private void setupDifficulty() {
+        if (difficulty.equals(Difficulty.HARD)) {
+            gap = 200;
             delay = 15;
-        }
-        else {
+        } else {
+            gap = 400;
             delay = 30;
         }
-        return delay;
-    }
-
-    public Enum<Difficulty> getDifficulty() {
-        return difficulty;
     }
 
     public void createPlayer(int score) {
-
         String input = JOptionPane.showInputDialog("Skriv ditt namn").trim();
 
         highScore.add(new Player(input, score));
@@ -280,7 +247,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         SaveAndLoad.saveHighScore(highScore);
     }
 
-    public void calHighScore(int score) {
+    public void addToHighScoreList(int score) {
         if (highScore.size() == 10 && highScore.get(highScore.size() - 1).getScore() < score) {
             highScore.remove(highScore.size() - 1);
             this.createPlayer(score);
