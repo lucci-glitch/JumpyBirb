@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
-    private final List<Rectangle> toRemove = new ArrayList<>();
+
     private final int speed = -5;
     private final Timer timer;
     private final List<Player> highScore;
@@ -19,9 +19,6 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     private Image birbWingsDown;
     private Image tumbleweed;
     private Image gameOverScreen;
-
-
-
     private boolean gameOver = false;
     private Rectangle birb;
     private List<Rectangle> obstacles;
@@ -29,7 +26,6 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     private int gap;
     private Enum<Difficulty> difficulty;
     private int delay;
-
 
     public GameSurface(final int width, final int height, final Enum<Difficulty> difficulty) {
 
@@ -40,7 +36,9 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         this.difficulty = difficulty;
 
         setupDifficulty();
+        addObstacles(1500);
         addObstacles();
+
 
         this.timer = new Timer(delay, this);
         this.timer.start();
@@ -54,13 +52,18 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     }
 
     private void addObstacles() {
+        addObstacles(1000);
+    }
 
+    private void addObstacles(int x) {
+
+        int minHeight = 75;
         int maxHeight = 600;
-        int topObstacleHeight = ThreadLocalRandom.current().nextInt(20, (maxHeight - gap));
+        int topObstacleHeight = ThreadLocalRandom.current().nextInt(minHeight, (maxHeight - gap - minHeight));
         int bottomObstacleHeight = maxHeight - gap - topObstacleHeight;
 
-        obstacles.add(new Rectangle(1000, maxHeight - bottomObstacleHeight, 150, bottomObstacleHeight));
-        obstacles.add(new Rectangle(1000, 0, 150, topObstacleHeight));
+        obstacles.add(new Rectangle(x, maxHeight - bottomObstacleHeight, 150, bottomObstacleHeight));
+        obstacles.add(new Rectangle(x, 0, 150, topObstacleHeight));
     }
 
 
@@ -115,16 +118,20 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             return;
         }
 
+        List<Rectangle> toRemove = new ArrayList<>();
+
         for (Rectangle obstacle : obstacles) {
             obstacle.translate(speed, 0);
 
-            recycleObstacles(obstacle);
+            findObstaclesToRecycle(obstacle, toRemove);
 
-            collisionDetector(obstacle);
+            // collisionDetector(obstacle);
 
             addScore(obstacle);
 
         }
+
+        recycleObstacles(toRemove);
 
         birb.translate(0, +2);
 
@@ -143,16 +150,19 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         }
     }
 
-    private void recycleObstacles(Rectangle obstacle) {
+    private void findObstaclesToRecycle(Rectangle obstacle, List<Rectangle> toRemove) {
         if (obstacle.x < -150) {
-
             toRemove.add(obstacle);
+        }
+    }
+
+    private void recycleObstacles(List<Rectangle> obstaclesToRemove) {
+        for (Rectangle obstacle : obstaclesToRemove) {
 
             if (obstacle.y == 0) {
                 addObstacles();
-                obstacles.removeAll(toRemove);
             }
-
+            obstacles.remove(obstacle);
         }
     }
 
@@ -166,14 +176,14 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     }
 
     public void increaseSpeed() {
-        if (timer.getDelay() > 4) {
+        if (timer.getDelay() > 8) {
             timer.setDelay(timer.getDelay() - 1);
         }
         System.out.println(timer.getDelay());
     }
 
     public void decreaseGap() {
-        if (this.gap > 50) {
+        if (this.gap > 125) {
             this.gap -= 5;
             System.out.println(this.gap);
         }
@@ -212,10 +222,10 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     public void restart() {
         this.gameOver = false;
         this.score = 0;
-
         this.birb = new Rectangle(70, 100, 60, 70);
         this.obstacles = new ArrayList<>();
 
+        addObstacles(1500);
         setupDifficulty();
         addObstacles();
         repaint();
@@ -235,7 +245,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             birbWingsUp = makeImage("images/birbNightWingsUp.png");
             birbWingsDown = makeImage("images/birbNightWingsDown.png");
         } else {
-            gap = 400;
+            gap = 275;
             delay = 30;
             background = makeImage("images/backgroundDay.jpg");
             gameOverScreen = makeImage("images/gameOverDay.jpg");
@@ -246,9 +256,9 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     }
 
     public void createPlayer(int score) {
-        String input = JOptionPane.showInputDialog("Skriv ditt namn").trim();
+        String input = JOptionPane.showInputDialog("Enter your name").trim();
 
-        highScore.add(new Player(input, score));
+        highScore.add(new Player(input, score, difficulty.toString()));
         highScore.sort(new ScoreComparator().reversed());
         SaveAndLoad.saveHighScore(highScore);
     }
@@ -261,8 +271,6 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             this.createPlayer(score);
         }
     }
-
-
 }
 
 
