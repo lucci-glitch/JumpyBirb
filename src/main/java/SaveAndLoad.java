@@ -15,8 +15,8 @@ public class SaveAndLoad {
         try (BufferedReader reader = new BufferedReader(new FileReader(file.toFile()))) {
             while ((player = reader.readLine()) != null) {
 
-                String[] score = player.split("-");
-                scoresAndName.add(new Player(score[0], Integer.parseInt(score[1])));
+                String[] score = player.split(" - ");
+                scoresAndName.add(new Player(score[0], Integer.parseInt(score[1]), score[2]));
             }
 
         } catch (FileNotFoundException e) {

@@ -4,15 +4,18 @@ public class Player {
 
     private final String name;
     private final int score;
+    private final String difficulty;
 
-    public Player(String name, int score) {
+
+    public Player(String name, int score, String difficulty) {
         this.name = name;
         this.score = score;
+        this.difficulty = difficulty.toString();
     }
 
     @Override
     public String toString() {
-        return name + "-" + score;
+        return name + " - " + score + " - " + difficulty;
 
     }
 

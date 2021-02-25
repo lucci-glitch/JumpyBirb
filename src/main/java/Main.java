@@ -2,7 +2,6 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
@@ -31,7 +30,6 @@ public class Main {
         main.addKeyListener(gs);
         main.setDefaultCloseOperation(EXIT_ON_CLOSE);
         main.setVisible(true);
-
 
         music();
 
