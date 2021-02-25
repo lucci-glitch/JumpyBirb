@@ -9,17 +9,10 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class GameSurface extends JPanel implements ActionListener, KeyListener {
+    private boolean gameOver = false;
 
-
-    private final int speed = -5;
     private final Timer timer;
     private final List<Player> highScore;
-    private Image background;
-    private Image birbWingsUp;
-    private Image birbWingsDown;
-    private Image tumbleweed;
-    private Image gameOverScreen;
-    private boolean gameOver = false;
     private Rectangle birb;
     private List<Rectangle> obstacles;
     private int score;
@@ -27,8 +20,13 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     private Enum<Difficulty> difficulty;
     private int delay;
 
-    public GameSurface(final int width, final int height, final Enum<Difficulty> difficulty) {
+    private Image background;
+    private Image birbWingsUp;
+    private Image birbWingsDown;
+    private Image tumbleweed;
+    private Image gameOverScreen;
 
+    public GameSurface(final int width, final int height, final Enum<Difficulty> difficulty) {
         this.highScore = SaveAndLoad.loadHighScore();
         this.score = 0;
         this.birb = new Rectangle(70, 100, 60, 70);
@@ -39,10 +37,8 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         addObstacles(1500);
         addObstacles();
 
-
         this.timer = new Timer(delay, this);
         this.timer.start();
-
     }
 
     @Override
@@ -56,7 +52,6 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
     }
 
     private void addObstacles(int x) {
-
         int minHeight = 75;
         int maxHeight = 600;
         int topObstacleHeight = ThreadLocalRandom.current().nextInt(minHeight, (maxHeight - gap - minHeight));
@@ -65,8 +60,7 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         obstacles.add(new Rectangle(x, maxHeight - bottomObstacleHeight, 150, bottomObstacleHeight));
         obstacles.add(new Rectangle(x, 0, 150, topObstacleHeight));
     }
-
-
+    
     private void repaint(Graphics g) {
         final Dimension d = this.getSize();
 
@@ -75,7 +69,6 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
             g.drawImage(gameOverScreen, 0, 0, d.width, d.height, null);
             g.setColor(Color.decode("#d3d5eb"));
             g.setFont(new Font("Arial", Font.BOLD, 21));
-
 
             int highscoreTextPosition = 100;
             for (Player gamer : highScore) {
@@ -89,11 +82,9 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
         for (Rectangle obstacle : obstacles) {
             g.drawImage(tumbleweed, obstacle.x, obstacle.y, obstacle.width, obstacle.height, null);
-
         }
 
         makeBirdFlap(g);
-
     }
 
     public void makeBirdFlap(Graphics g) {
@@ -112,7 +103,6 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
         if (gameOver) {
             timer.stop();
             return;
@@ -121,14 +111,10 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         List<Rectangle> toRemove = new ArrayList<>();
 
         for (Rectangle obstacle : obstacles) {
-            obstacle.translate(speed, 0);
-
+            obstacle.translate(-5, 0);
             findObstaclesToRecycle(obstacle, toRemove);
-
-            // collisionDetector(obstacle);
-
+            collisionDetector(obstacle);
             addScore(obstacle);
-
         }
 
         recycleObstacles(toRemove);
@@ -141,7 +127,6 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         }
 
         this.repaint();
-
     }
 
     private void collisionDetector(Rectangle obstacle) {
@@ -179,29 +164,23 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         if (timer.getDelay() > 8) {
             timer.setDelay(timer.getDelay() - 1);
         }
-        System.out.println(timer.getDelay());
     }
 
     public void decreaseGap() {
         if (this.gap > 125) {
             this.gap -= 5;
-            System.out.println(this.gap);
         }
     }
 
-
     @Override
     public void keyReleased(KeyEvent e) {
-
         final int maxHeight = 20;
-
         final int kc = e.getKeyCode();
 
         if (kc == KeyEvent.VK_SPACE && birb.y > maxHeight) {
             birb.translate(0, -75);
         }
     }
-
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -210,11 +189,9 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-
         final int kc = e.getKeyCode();
 
         if (gameOver == true && kc == KeyEvent.VK_SPACE) {
-
             restart();
         }
     }
@@ -229,7 +206,6 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
         setupDifficulty();
         addObstacles();
         repaint();
-
 
         this.timer.setDelay(delay);
         this.timer.start();
@@ -257,7 +233,6 @@ public class GameSurface extends JPanel implements ActionListener, KeyListener {
 
     public void createPlayer(int score) {
         String input = JOptionPane.showInputDialog("Enter your name").trim();
-
         highScore.add(new Player(input, score, difficulty.toString()));
         highScore.sort(new ScoreComparator().reversed());
         SaveAndLoad.saveHighScore(highScore);
